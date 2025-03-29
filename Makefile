@@ -49,3 +49,12 @@ setup-kind:
 	kind delete cluster --name trickster || true
 	kind create cluster --config kind-config.yaml
 	$(MAKE) install-nginx install-prom install-openebs
+
+GITHUB_REPOSITORY_OWNER ?= $(TRICKSTER_ORG)
+publish:
+	@for pkg in charts/*; do \
+	if [[ "$$pkg" == "charts/trickster" ]]; then \
+	continue; \
+	fi; \
+	helm push "${pkg}" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts"; \
+	done
