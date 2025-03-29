@@ -50,11 +50,18 @@ setup-kind:
 	kind create cluster --config kind-config.yaml
 	$(MAKE) install-nginx install-prom install-openebs
 
+.PHONY: package
+package:
+	helm package charts/trickster-v2 --destination charts
+
 GITHUB_REPOSITORY_OWNER ?= $(TRICKSTER_ORG)
-publish:
-	@for pkg in charts/*; do \
-	if [[ "$$pkg" == "charts/trickster" ]]; then \
-	continue; \
-	fi; \
-	helm push "${pkg}" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts"; \
+GHCR_REPO ?= ghcr.io/$(GITHUB_REPOSITORY_OWNER)/charts
+.PHONY: publish
+publish: package
+	@for pkg in charts/*.tgz; do \
+		if [[ "$$pkg" =~ "charts/trickster-1" ]]; then \
+			continue; \
+		fi; \
+		echo "Publishing $${pkg} to $(GHCR_REPO)"; \
+		helm push "$${pkg}" "oci://$(GHCR_REPO)"; \
 	done
