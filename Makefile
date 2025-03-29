@@ -1,6 +1,7 @@
 TRICKSTER_ORG ?= trickstercache
 IMAGE_REPO ?= ghcr.io/$(TRICKSTER_ORG)/trickster
 IMAGE_TAG ?= main
+SHELL := /bin/bash
 
 .PHONY: uninstall
 uninstall:
